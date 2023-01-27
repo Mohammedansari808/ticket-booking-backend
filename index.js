@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv"
 import { auth } from "./middleware/auth.js";
+import nodemailer from "nodemailer"
+import { resetauth } from "./middleware/resetauth.js";
 dotenv.config()
 const app = express();
 const MONGO_URL = "mongodb://127.0.0.1";
@@ -21,7 +23,7 @@ app.get("/", function (request, response) {
 });
 /////////////////////
 app.post("/signup", async function (request, response) {
-    const { username, password } = request.body
+    const { username, password, email } = request.body
     const isCheck = await client.db("bookmyshow").collection("login").findOne({ username: username })
     if (!isCheck) {
         const Hashedpassword = await Hashed(password)
@@ -34,7 +36,8 @@ app.post("/signup", async function (request, response) {
         let finalData = {
             username: username,
             password: Hashedpassword,
-            role_id: 0
+            role_id: 0,
+            email: email
         }
         const insertData = await client.db("bookmyshow").collection("login").insertOne(finalData)
         if (insertData) {
@@ -242,8 +245,134 @@ app.put("/userseatbooking/:id/:username/:movie_id", async function (request, res
 
 
 
-app.get("/", function (request, response) {
-    response.send("🙋‍♂️, 🌏 🎊✨🤩");
+app.post("/forgetpassword", async function (request, response) {
+    const { username, email } = request.body;
+    console.log(username)
+    const data = await client.db("bookmyshow").collection("login").findOne({ username: username })
+    console.log(data)
+    if (data.username == username && data.email == email) {
+        let tempLink = ""
+        const character = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"
+        const characters = character.length
+        for (let i = 0; i < 40; i++) {
+            tempLink += character.charAt(Math.floor(Math.random() * characters))
+
+        }
+        const otp = Math.floor(1000 + Math.random() * 9000)
+        const otpData = {
+            otp: otp,
+            email: email,
+            username: username,
+            tempLink: `http://localhost:3000/verification-link/${username}/${tempLink}`,
+        }
+
+        const checkData = await client.db("bookmyshow").collection("otp").findOne({ username: username })
+        console.log(checkData)
+        if (!checkData) {
+            const otpInsertData = client.db("bookmyshow").collection("otp").insertOne(otpData)
+
+            const finalData = await client.db("bookmyshow").collection("otp").findOne({ username: username })
+
+            setTimeout(() => {
+                client.db("bookmyshow").collection("otp").DeleteOne({ otp: finalData.otp })
+            }, 80000);
+
+            async function main(finalData) {
+                // Generate test SMTP service account from ethereal.email
+                // Only needed if you don't have a real mail account for testing
+                let username = finalData.username;
+                let otp = finalData.otp;
+                let email = finalData.email;
+                let tempLink = finalData.tempLink
+                let testAccount = await nodemailer.createTestAccount();
+                console.log("hello")
+                // create reusable transporter object using the default SMTP transport
+                let transporter = nodemailer.createTransport({
+                    host: "smtp.gmail.com",
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: "mohammedansari808@gmail.com",
+                        pass: "gjehcxvsnxpvpxro"
+                        ,
+                    },
+                });
+
+                // send mail with defined transport object
+                let info = await transporter.sendMail({
+                    from: '"bookmyshow" <foo@example.com>', // sender address
+                    to: `${email}`, // list of receivers
+                    subject: "Verification link", // Subject line
+                    text: "Hello world?", // plain text body
+                    html: `Hi ${username} your otp is <strong>${otp} </strong>it will expire in one minute
+                    please paste it in the following link ${tempLink}`, // html body
+                });
+
+                console.log("Message sent: %s", info.messageId);
+                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+                // Preview only available when sending through an Ethereal account
+                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+            }
+
+            main(finalData).catch(console.error);
+            response.send({ message: "link sent" });
+            ;
+
+        }
+
+
+
+
+    } else {
+        response.send("error")
+    }
+
+    // async..await is not allowed in global scope, must use a wrapper
+
 });
+
+
+app.post("/verification-link/:username/:id", async function (request, response) {
+    const { username, id } = request.params
+
+    let data = request.body
+    const otpData = await client.db("bookmyshow").collection("otp").findOne({ username: username })
+
+    if (parseInt(data.otp) == parseInt(otpData.otp)) {
+        const token = jwt.sign({ _id: ObjectId(data._id) }, process.env.RESET_KEY)
+        response.send({ message: "otp success", username: username, token: token })
+    } else {
+        response.send({ message: "error" })
+    }
+
+})
+
+app.put("/password-change/:username", resetauth, async function (request, response) {
+    let data = request.body
+    const { username } = request.params
+
+
+
+    const Hashedpassword = await Hashed(data.newpassword)
+    async function Hashed(password) {
+        const NO_OF_ROUNDS = 10
+        const salt = await bcrypt.genSalt(NO_OF_ROUNDS)
+        const HashedPassword = await bcrypt.hash(password, salt)
+        return HashedPassword
+    }
+    let checkuser = await client.db("bookmyshow").collection("login").updateOne({ username: username }, { $set: { password: Hashedpassword } })
+    if (checkuser) {
+        response.send({ message: "success" })
+    } else if (response.status === 404) {
+        response.send({ message: "error" })
+    }
+
+
+
+
+
+})
 
 app.listen(PORT, () => console.log(`The server started in: ${PORT} ✨✨`));
