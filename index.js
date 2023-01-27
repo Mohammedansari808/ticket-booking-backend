@@ -108,7 +108,8 @@ app.put("/createshows/:id", auth, async function (request, response) {
                     booked: false,
                     occupied: false,
                     username: "",
-                    _id: new ObjectId()
+                    _id: new ObjectId(),
+                    rate: 200
                 })
 
             }
@@ -197,16 +198,6 @@ app.delete('/delshows/:id', async function (request
 })
 
 
-app.put("/deleteuser/:id", auth, async function (request, response) {
-
-    let theaterShow = await client.db("bookmyshow").collection("theaters").updateOne({ theatername: "rohini" }, {
-        $set: {
-            "shows.$[m].allseats.$[s].username": "helo"
-        }
-    }, { arrayFilters: [{ "m._id": ObjectId("63d174b897565bab467e2bbd") }, { "s._id": ObjectId("63d174b897565bab467e2b59") }] })
-    theaterShow ? console.log("hello") : null
-})
-
 app.put("/userseatbooking/:id/:username/:movie_id", async function (request, response) {
     let data = request.body
     let count = 0
@@ -234,15 +225,6 @@ app.put("/userseatbooking/:id/:username/:movie_id", async function (request, res
     }
 
 })
-
-
-// let theaterShow = await client.db("bookmyshow").collection("theaters").updateOne({ theatername: "rohini" }, {
-//     $set: {
-//         "shows.$[m].allseats.$[s].username": "helo"
-//     }
-// }, { arrayFilters: [{ "m._id": ObjectId("63d174b897565bab467e2bbd") }, { "s._id": ObjectId("63d174b897565bab467e2b59") }] })
-// theaterShow ? console.log("hello") : null
-
 
 
 app.post("/forgetpassword", async function (request, response) {
@@ -274,8 +256,8 @@ app.post("/forgetpassword", async function (request, response) {
             const finalData = await client.db("bookmyshow").collection("otp").findOne({ username: username })
 
             setTimeout(() => {
-                client.db("bookmyshow").collection("otp").DeleteOne({ otp: finalData.otp })
-            }, 80000);
+                client.db("bookmyshow").collection("otp").deleteOne({ otp: finalData.otp })
+            }, 120000);
 
             async function main(finalData) {
                 // Generate test SMTP service account from ethereal.email
