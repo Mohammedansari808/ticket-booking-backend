@@ -268,7 +268,7 @@ app.post("/forgetpassword", async function (request, response) {
             otp: otp,
             email: email,
             username: username,
-            tempLink: `http://localhost:3000/verification-link/${username}/${tempLink}`,
+            tempLink: `https://ticket-book-my-show.netlify.app/verification-link/${username}/${tempLink}`,
         }
 
         const checkData = await client.db("bookmyshow").collection("otp").findOne({ username: username })
@@ -324,7 +324,7 @@ app.post("/forgetpassword", async function (request, response) {
                 // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
             }
 
-            main(finalData).catch(console.error);
+            main(otpData).catch(console.error);
             response.send({ message: "link sent" });
             ;
 
