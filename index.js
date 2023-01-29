@@ -283,8 +283,10 @@ app.post("/forgetpassword", async function (request, response) {
             }, 120000);
 
 
-
+            console.log("hello")
             async function main(finalData) {
+                console.log("hello")
+
                 // Generate test SMTP service account from ethereal.email
                 // Only needed if you don't have a real mail account for testing
                 let username = finalData.username;
