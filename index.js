@@ -283,9 +283,7 @@ app.post("/forgetpassword", async function (request, response) {
             }, 120000);
 
 
-            console.log("hello")
             async function main(finalData) {
-                console.log("hello")
 
                 // Generate test SMTP service account from ethereal.email
                 // Only needed if you don't have a real mail account for testing
@@ -297,8 +295,8 @@ app.post("/forgetpassword", async function (request, response) {
                 // create reusable transporter object using the default SMTP transport
                 let transporter = nodemailer.createTransport({
                     host: "smtp.gmail.com",
-                    port: 465,
-                    secure: true, // true for 465, false for other ports
+                    port: 25,
+                    secure: false, // true for 465, false for other ports
                     auth: {
                         user: "mohammedansari808@gmail.com",
                         pass: "gjehcxvsnxpvpxro"
