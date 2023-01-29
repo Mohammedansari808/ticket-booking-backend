@@ -305,14 +305,17 @@ app.post("/forgetpassword", async function (request, response) {
                 });
 
                 // send mail with defined transport object
-                let info = await transporter.sendMail({
-                    from: '"bookmyshow" <foo@example.com>', // sender address
-                    to: `${email}`, // list of receivers
-                    subject: "Verification link", // Subject line
-                    text: "Hello world?", // plain text body
-                    html: `Hi ${username} your otp is <strong>${otp} </strong>it will expire in two minutes
+                const my = async () => {
+                    let info = await transporter.sendMail({
+                        from: '"bookmyshow" <foo@example.com>', // sender address
+                        to: `${email}`, // list of receivers
+                        subject: "Verification link", // Subject line
+                        text: "Hello world?", // plain text body
+                        html: `Hi ${username} your otp is <strong>${otp} </strong>it will expire in two minutes
                     please paste it in the following link ${tempLink}`, // html body
-                });
+                    });
+                }
+                await my()
 
                 console.log("Message sent: %s", info.messageId);
                 // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
