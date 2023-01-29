@@ -279,7 +279,7 @@ app.post("/forgetpassword", async function (request, response) {
 
 
             setTimeout(async () => {
-                await client.db("bookmyshow").collection("otp").deleteOne({ otp: finalData.otp })
+                await client.db("bookmyshow").collection("otp").deleteOne({ otp: otp })
             }, 120000);
 
 
@@ -386,7 +386,7 @@ app.put("/password-change/:username", resetauth, async function (request, respon
 
 //////////payment//////
 
-app.post("/pay", async function (request, response) {
+app.post("/pay", auth, async function (request, response) {
 
     const data = request.body;
     // Create a PaymentIntent with the order amount and currency
