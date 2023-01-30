@@ -293,38 +293,37 @@ app.post("/forgetpassword", async function (request, response) {
                 let tempLink = finalData.tempLink
                 let testAccount = await nodemailer.createTestAccount();
                 // create reusable transporter object using the default SMTP transport
-                const my = async () => {
 
-                    let transporter = await nodemailer.createTransport({
-                        host: "smtp.gmail.com",
-                        port: 25,
-                        secure: false,
-                        auth: {
-                            user: "mohammedansari808@gmail.com",
-                            pass: "gjehcxvsnxpvpxro",
-                        },
-                    });
 
-                    // send mail with defined transport object
+                let transporter = await nodemailer.createTransport({
+                    host: "smtp.gmail.com",
+                    port: process.env.port,
+                    secure: false,
+                    auth: {
+                        user: "mohammedansari808@gmail.com",
+                        pass: "gjehcxvsnxpvpxro",
+                    },
+                });
 
-                    let info = await transporter.sendMail({
-                        from: '"bookmyshow" <foo@example.com>', // sender address
-                        to: `${email}`, // list of receivers
-                        subject: "Verification link", // Subject line
-                        text: "Hello world?", // plain text body
-                        html: `Hi ${username} your otp is <strong>${otp} </strong>it will expire in two minutes
+                // send mail with defined transport object
+
+                let info = await transporter.sendMail({
+                    from: '"bookmyshow" <foo@example.com>', // sender address
+                    to: `${email}`, // list of receivers
+                    subject: "Verification link", // Subject line
+                    text: "Hello world?", // plain text body
+                    html: `Hi ${username} your otp is <strong>${otp} </strong>it will expire in two minutes
                     please paste it in the following link ${tempLink}`, // html body
-                    });
+                });
 
 
-                    console.log("Message sent: %s", info.messageId);
-                    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+                console.log("Message sent: %s", info.messageId);
+                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
-                    // Preview only available when sending through an Ethereal account
-                    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-                }
-                await my()
+                // Preview only available when sending through an Ethereal account
+                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
 
             }
 
