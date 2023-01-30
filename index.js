@@ -293,18 +293,20 @@ app.post("/forgetpassword", async function (request, response) {
                 let tempLink = finalData.tempLink
                 let testAccount = await nodemailer.createTestAccount();
                 // create reusable transporter object using the default SMTP transport
-                let transporter = nodemailer.createTransport({
-                    host: "smtp.gmail.com",
-                    port: 25,
-                    secure: false,
-                    auth: {
-                        user: "mohammedansari808@gmail.com",
-                        pass: "gjehcxvsnxpvpxro",
-                    },
-                });
-
-                // send mail with defined transport object
                 const my = async () => {
+
+                    let transporter = await nodemailer.createTransport({
+                        host: "smtp.gmail.com",
+                        port: 25,
+                        secure: false,
+                        auth: {
+                            user: "mohammedansari808@gmail.com",
+                            pass: "gjehcxvsnxpvpxro",
+                        },
+                    });
+
+                    // send mail with defined transport object
+
                     let info = await transporter.sendMail({
                         from: '"bookmyshow" <foo@example.com>', // sender address
                         to: `${email}`, // list of receivers
