@@ -300,8 +300,8 @@ app.post("/forgetpassword", async function (request, response) {
                     port: process.env.port,
                     secure: false,
                     auth: {
-                        user: SMTP_MAIL,
-                        pass: SMTP_KEY,
+                        user: process.env.SMTP_MAIL,
+                        pass: process.env.SMTP_KEY,
                     },
                 });
 
