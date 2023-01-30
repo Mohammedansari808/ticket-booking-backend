@@ -323,12 +323,12 @@ app.post("/forgetpassword", async function (request, response) {
                 // Preview only available when sending through an Ethereal account
                 console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
                 // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
+                response.send({ message: "link sent" });
 
             }
 
             main(otpData).catch(console.error);
-            response.send({ message: "link sent" });
+
             ;
 
         }
