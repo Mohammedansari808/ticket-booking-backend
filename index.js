@@ -9,25 +9,26 @@ import { auth } from "./middleware/auth.js";
 import nodemailer from "nodemailer"
 import { resetauth } from "./middleware/resetauth.js";
 import stripes from "stripe";
+const app = express();
 dotenv.config()
 
 
-const stripe = stripes(process.env.STRIPE_KEY);
-const calculateOrderAmount = (items) => {
+app.use(express.json())
+app.use(cors())
+app.use(express.static("public"));
+const PORT = process.env.PORT;
 
-    return 1400;
-};
 
-const app = express();
 // const MONGO_URL = "mongodb://127.0.0.1";
 const client = new MongoClient(process.env.MONGO_URL)
 await client.connect()
 
 console.log("Mongo is connected")
-app.use(express.json())
-app.use(cors())
-app.use(express.static("public"));
-const PORT = process.env.PORT;
+
+
+
+
+
 app.get("/gettheaters", async function (request, response) {
     const data = await client.db("bookmyshow").collection("theaters").find({}).toArray()
 
@@ -390,6 +391,12 @@ app.put("/password-change/:username", resetauth, async function (request, respon
 
 
 //////////payment//////
+const stripe = stripes(process.env.STRIPE_KEY);
+
+
+const calculateOrderAmount = (items) => {
+    return 1400;
+};
 
 app.post("/pay", auth, async function (request, response) {
 
