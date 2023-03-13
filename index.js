@@ -395,7 +395,7 @@ const stripe = stripes(process.env.STRIPE_KEY);
 
 
 const calculateOrderAmount = (items) => {
-    return 1400;
+    return items * 100
 };
 
 app.post("/pay", auth, async function (request, response) {
